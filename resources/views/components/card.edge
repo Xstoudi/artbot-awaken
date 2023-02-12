@@ -1,0 +1,11 @@
+@if(link)
+<a href="{{ link }}"
+  class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow max-h-max sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+  {{{ await $slots.main() }}}
+</a>
+@else
+<div
+  class="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow max-h-max sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+  {{{ await $slots.main() }}}
+</div>
+@end

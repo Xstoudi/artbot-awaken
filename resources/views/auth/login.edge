@@ -1,0 +1,26 @@
+@layout('layouts/main')
+@set('title', 'Login')
+
+@section('body')
+<div class="flex justify-center w-full">
+  @card()
+  <form class="space-y-6" action="{{ route('auth.login') }}" method="post">
+    <h5 class="text-xl font-medium text-gray-900 dark:text-white">Login</h5>
+    @!component('components/input', {
+    name: 'email',
+    type: 'email',
+    label: 'Email'
+    })
+    @!component('components/input', {
+    name: 'password',
+    type: 'password',
+    label: 'Password'
+    })
+    @!component('components/button', {
+    type: 'submit',
+    label: 'Login'
+    })
+  </form>
+  @end
+</div>
+@end

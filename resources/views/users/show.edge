@@ -1,0 +1,55 @@
+@layout('layouts/main')
+@set('title', 'User')
+
+@section('body')
+<div class="flex justify-center w-full gap-4">
+  @card()
+  <div>
+    <h2 class="text-2xl font-bold">User</h2>
+    <ul>
+      <li><span class="font-bold">Email :</span> {{ user.email }}</li>
+      <li><span class="font-bold">Created at :</span> {{ i18n.formatDate(user.createdAt, { dateStyle: 'long' }) }}</li>
+      <li><span class="font-bold">Updated at :</span> {{ i18n.formatDate(user.updatedAt, { dateStyle: 'long' }) }}</li>
+    </ul>
+    @if(user.id === auth.user.id)
+    <form method="post" action="{{ route('auth.logout') }}">
+      @!button({
+      label: 'Logout',
+      type: 'submit',
+      })
+    </form>
+    @end
+  </div>
+  @end
+
+  @if(user.id === auth.user.id)
+  @card()
+  <form class="space-y-4" method="post" action="{{ route('users.changePassword', [user.id]) }}">
+    <h2 class="text-2xl font-bold">Change password</h2>
+    @!input({
+    name: 'oldPassword',
+    label: 'Old password',
+    type: 'password',
+    required: true,
+    })
+    @!input({
+    name: 'password',
+    label: 'New password',
+    type: 'password',
+    required: true,
+    })
+    @!input({
+    name: 'passwordConfirmation',
+    label: 'New password confirmation',
+    type: 'password',
+    required: true,
+    })
+    @!button({
+    label: 'Change password',
+    type: 'submit',
+    })
+  </form>
+  @end
+  @end
+</div>
+@end

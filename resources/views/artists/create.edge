@@ -1,0 +1,41 @@
+@layout('layouts/main')
+@set('title', 'Artists')
+
+@section('body')
+<div class="flex justify-center w-full">
+  @card()
+  <form class="space-y-6" action="{{ route('artists.store') }}" method="post">
+    <h5 class="text-xl font-medium text-gray-900 dark:text-white">Create artist</h5>
+    @!input({
+    name: 'mastoAccessToken',
+    type: 'text',
+    label: 'Mastodon access token',
+    required: true
+    })
+    @!input({
+    name: 'wikiartIdentifier',
+    type: 'text',
+    label: 'Wikiart artist identifier',
+    required: true
+    })
+    @!input({
+    name: 'wikiartSeo',
+    type: 'text',
+    label: 'Wikiart SEO name',
+    required: true
+    })
+    @!input({
+    name: 'tags',
+    type: 'text',
+    label: 'Tags (comma separated)',
+    required: false
+    })
+    @!button({
+    type: 'submit',
+    label: 'Create'
+    })
+  </form>
+  @end
+</div>
+
+@end

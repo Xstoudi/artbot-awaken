@@ -3,7 +3,8 @@ import axios, { AxiosInstance } from 'axios'
 import Env from '@ioc:Adonis/Core/Env'
 import Logger from '@ioc:Adonis/Core/Logger'
 
-const URL = 'https://www.wikiart.org/en/Api/2'
+export const WIKIART_BASE_URL = 'https://www.wikiart.org/en'
+const API_URL = `${WIKIART_BASE_URL}/Api/2`
 
 export default class Wikiart {
   private static cachedSession: string | null = null
@@ -29,7 +30,7 @@ export default class Wikiart {
 
   private static async newSession() {
     await Wikiart.timeCheck()
-    const { data } = await axios.get(`${URL}/login`, {
+    const { data } = await axios.get(`${API_URL}/login`, {
       params: {
         accessCode: Env.get('WIKIART_ACCESS_CODE'),
         secretCode: Env.get('WIKIART_SECRET_CODE'),
@@ -91,7 +92,7 @@ export default class Wikiart {
 
             await Wikiart.timeCheck()
             const response = await instance.get<ListWithPagination<PaintingShort>>(
-              `${URL}/PaintingsByArtist`,
+              `${API_URL}/PaintingsByArtist`,
               {
                 params,
               }
@@ -115,7 +116,7 @@ export default class Wikiart {
   public async painting(id: string) {
     await Wikiart.timeCheck()
     return this.instance
-      .get<Painting>(`${URL}/Painting`, {
+      .get<Painting>(`${API_URL}/Painting`, {
         params: {
           id,
           authSessionKey: Wikiart.cachedSession,

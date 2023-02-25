@@ -8,7 +8,11 @@ Route.post('/auth/logout', 'AuthController.logout').as('auth.logout').middleware
 
 Route.group(() => {
   Route.resource('/artists', 'ArtistsController').as('artists')
-  Route.resource('/missings', 'MissingsController').as('missings')
+  Route.post('/artists/:id/toot', 'ArtistsController.toot').as('artists.toot')
+  Route.resource('/artists.missings', 'MissingsController')
+    .as('missings')
+    .paramFor('artists', 'artistId')
+    .paramFor('missings', 'paintingId')
   Route.get('/users/:id', 'UsersController.show').as('users.show')
   Route.post('/users/:id/password', 'UsersController.changePassword').as('users.changePassword')
 }).middleware('auth')

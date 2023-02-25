@@ -5,7 +5,8 @@ export default class MissingUpdateValidator {
   constructor(protected ctx: HttpContextContract) {}
 
   public schema = schema.create({
-    sensitive: schema.boolean(),
+    contentWarning: schema.string.optional(),
+    banned: schema.boolean.optional(),
   })
 
   public messages: CustomMessages = {}

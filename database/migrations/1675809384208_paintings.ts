@@ -14,7 +14,10 @@ export default class extends BaseSchema {
       table.smallint('completition_year')
       table.string('image_url').notNullable()
 
-      table.boolean('sensitive').defaultTo(null)
+      table.string('content_warning').defaultTo(null)
+      table.boolean('banned').defaultTo(false)
+
+      table.integer('reviewer_id').unsigned().references('id').inTable('users').onDelete('SET NULL')
 
       table.timestamp('posted_at', { useTz: true }).defaultTo(null)
 

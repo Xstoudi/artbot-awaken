@@ -3,11 +3,11 @@ import Artist from 'App/Models/Artist'
 import { formRequest } from '@melchyore/adonis-form-request/build'
 import StoreArtistRequest from 'App/Requests/StoreArtistRequest'
 import Mastodon from 'App/Services/Mastodon'
-import Painting from 'App/Models/Painting'
 import Tag from 'App/Models/Tag'
 import sanitizeTag from 'App/Services/SanitizeTag'
 import Database from '@ioc:Adonis/Lucid/Database'
 import { DateTime } from 'luxon'
+import execa from 'execa'
 
 export default class ArtistsController {
   public async index({ view }: HttpContextContract) {
@@ -19,10 +19,11 @@ export default class ArtistsController {
             .then((masto) => masto.verifyCredentials())
             .then(async (mastoAccount) => ({
               id: artistData.id,
+              name: artistData.name,
               mastodon: mastoAccount,
               paintingsCount: await Database.from('paintings')
                 .where('artist_id', artistData.id)
-                .count('* as count')
+                .count('id as count')
                 .then(([{ count }]) => count),
             }))
         )
@@ -82,19 +83,37 @@ export default class ArtistsController {
 
     await artist.load('tags')
 
-    const paintings = await Painting.query()
-      .where('artistId', artist.id)
+    const paintings = await artist
+      .related('paintings')
+      .query()
       .preload('tags')
+      .preload('reviewer')
       .paginate(page, 10)
 
     paintings.baseUrl(`/artists/${id}`)
 
     const instance = await Mastodon.with(artist.mastoAccessToken)
 
+    const totalCount: { count: string } | null = await Database.from('paintings')
+      .select(Database.raw('count(id) as count'))
+      .where('artist_id', artist.id)
+      .first()
+    const reviewedCount: { count: string } | null = await Database.from('paintings')
+      .select(Database.raw('count(id) as count'))
+      .where('artist_id', artist.id)
+      .andWhereNotNull('reviewer_id')
+      .first()
+
+    const total = totalCount !== null ? Number(totalCount.count) : 0
+    const reviewed = reviewedCount !== null ? Number(reviewedCount.count) : 0
+
+    const ratio = total === 0 ? 0 : 100 * (reviewed / total)
+
     return view.render('artists/show', {
       artist,
       paintings,
       mastodon: await instance.verifyCredentials(),
+      missingRatio: ratio.toFixed(2),
     })
   }
 
@@ -114,5 +133,17 @@ export default class ArtistsController {
     artist.deletedAt = DateTime.now()
     await artist.save()
     return response.redirect().toRoute('artists.index')
+  }
+
+  public async toot({ request, response }: HttpContextContract) {
+    const { id } = request.params()
+    try {
+      await execa.node('ace', ['toot', '-a', id], {})
+    } catch (error) {
+      // TODO handle error
+    }
+    // TODO handle success
+
+    return response.redirect().back()
   }
 }

@@ -1,7 +1,19 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  column,
+  HasMany,
+  hasMany,
+  ManyToMany,
+  manyToMany,
+  ModelQueryBuilderContract,
+  scope,
+} from '@ioc:Adonis/Lucid/Orm'
 import Painting from './Painting'
 import Tag from './Tag'
+import Database from '@ioc:Adonis/Lucid/Database'
+
+type Builder = ModelQueryBuilderContract<typeof Artist>
 
 export default class Artist extends BaseModel {
   @column({ isPrimary: true })
@@ -9,6 +21,9 @@ export default class Artist extends BaseModel {
 
   @hasMany(() => Painting)
   public paintings: HasMany<typeof Painting>
+
+  @column()
+  public name: string
 
   @column()
   public mastoAccessToken: string
@@ -30,4 +45,14 @@ export default class Artist extends BaseModel {
 
   @manyToMany(() => Tag)
   public tags: ManyToMany<typeof Tag>
+
+  public static withMissingReviewCount = scope((query: Builder, artistId: number) => {
+    query.select([
+      Database.from('paintings').count('* AS total').where('artist_id', artistId),
+      Database.from('paintings')
+        .count('* AS reviewed')
+        .where('artist_id', artistId)
+        .whereNotNull('reviewer_id'),
+    ])
+  })
 }

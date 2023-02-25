@@ -4,13 +4,12 @@ import {
   BelongsTo,
   belongsTo,
   column,
-  HasOne,
-  hasOne,
   ManyToMany,
   manyToMany,
 } from '@ioc:Adonis/Lucid/Orm'
 import Artist from './Artist'
 import Tag from './Tag'
+import User from './User'
 
 export default class Painting extends BaseModel {
   @column({ isPrimary: true })
@@ -18,6 +17,9 @@ export default class Painting extends BaseModel {
 
   @column()
   public artistId: number
+
+  @column()
+  public reviewerId: number | null
 
   @column()
   public wikiartIdentifier: string
@@ -32,7 +34,13 @@ export default class Painting extends BaseModel {
   public imageUrl: string
 
   @column()
-  public sensitive: boolean | null
+  public url: string
+
+  @column()
+  public contentWarning: string | null
+
+  @column()
+  public banned: boolean
 
   @column.dateTime()
   public postedAt?: DateTime
@@ -45,6 +53,9 @@ export default class Painting extends BaseModel {
 
   @belongsTo(() => Artist)
   public artist: BelongsTo<typeof Artist>
+
+  @belongsTo(() => User, { foreignKey: 'reviewerId' })
+  public reviewer: BelongsTo<typeof User>
 
   @manyToMany(() => Tag)
   public tags: ManyToMany<typeof Tag>

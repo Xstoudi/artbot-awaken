@@ -22,7 +22,15 @@
       "description": "Send toot to Mastodon",
       "args": [],
       "aliases": [],
-      "flags": []
+      "flags": [
+        {
+          "name": "Artist identifier",
+          "propertyName": "artist",
+          "type": "number",
+          "alias": "a",
+          "description": "Artist identifier in database for whom to tweet"
+        }
+      ]
     },
     "dump:rcfile": {
       "settings": {},

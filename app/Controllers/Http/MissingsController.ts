@@ -5,24 +5,35 @@ import Painting from 'App/Models/Painting'
 import MissingUpdateRequest from 'App/Requests/MissingUpdateRequest'
 
 export default class MissingsController {
-  public async index({ response, view }: HttpContextContract) {
-    const missing = await Painting.query().whereNull('sensitive').preload('artist').first()
-    if (!missing) {
-      const counts: { sensitive: boolean | null; count: number }[] = await Database.from(
-        'paintings'
-      )
-        .select(['sensitive', Database.raw('count(*) as count')])
-        .groupBy('sensitive')
+  public async index({ response, request, view }: HttpContextContract) {
+    const { artistId } = request.params()
+    const missing = await Painting.query()
+      .whereNull('reviewer_id')
+      .where('artist_id', artistId)
+      .first()
 
-      const nulled = counts.find((c) => c.sensitive === null)?.count || 0
-      const filled = counts.filter((c) => c.sensitive !== null).reduce((a, b) => a + b.count, 0)
-      const total = nulled + filled
-      const ratio = total === 0 ? 0 : 100 * (filled / total)
+    if (!missing) {
+      const totalCount: { count: string } | null = await Database.from('paintings')
+        .select(Database.raw('count(id) as count'))
+        .where('artist_id', artistId)
+        .first()
+      const reviewedCount: { count: string } | null = await Database.from('paintings')
+        .select(Database.raw('count(id) as count'))
+        .where('artist_id', artistId)
+        .andWhereNotNull('reviewer_id')
+        .first()
+
+      const total = totalCount !== null ? Number(totalCount.count) : 0
+      const reviewed = reviewedCount !== null ? Number(reviewedCount.count) : 0
+
+      const ratio = total === 0 ? 0 : 100 * (reviewed / total)
+
       return view.render('missings/index', {
         ratio: ratio.toFixed(2),
       })
     }
-    return response.redirect().toRoute('missings.show', { id: missing.id })
+
+    return response.redirect().toRoute('missings.show', { artistId, paintingId: missing.id })
   }
 
   public async create({}: HttpContextContract) {
@@ -36,22 +47,28 @@ export default class MissingsController {
   }
 
   public async show({ request, view }: HttpContextContract) {
-    const { id } = request.params()
-    const missing = await Painting.findOrFail(id)
+    const { artistId, paintingId } = request.params()
+    const missing = await Painting.findOrFail(paintingId)
 
     await missing.load('artist')
 
-    const counts: { sensitive: boolean | null; count: string }[] = await Database.from('paintings')
-      .select(['sensitive', Database.raw('count(*) as count')])
-      .groupBy('sensitive')
+    const totalCount: { count: string } | null = await Database.from('paintings')
+      .select(Database.raw('count(id) as count'))
+      .where('artist_id', artistId)
+      .first()
+    const reviewedCount: { count: string } | null = await Database.from('paintings')
+      .select(Database.raw('count(id) as count'))
+      .where('artist_id', artistId)
+      .andWhereNotNull('reviewer_id')
+      .first()
 
-    const nulled = Number(counts.find((c) => c.sensitive === null)?.count) || 0
-    const filled = counts
-      .filter((c) => c.sensitive !== null)
-      .reduce((a, b) => a + Number(b.count), 0)
-    const total = nulled + filled
-    const ratio = total === 0 ? 0 : 100 * (filled / total)
+    const total = totalCount !== null ? Number(totalCount.count) : 0
+    const reviewed = reviewedCount !== null ? Number(reviewedCount.count) : 0
+
+    const ratio = total === 0 ? 0 : 100 * (reviewed / total)
+
     return view.render('missings/show', {
+      artistId,
       missing,
       ratio: ratio.toFixed(2),
     })
@@ -63,15 +80,18 @@ export default class MissingsController {
   }
 
   @formRequest()
-  public async update({ response }: HttpContextContract, request: MissingUpdateRequest) {
-    const { id } = request.params()
+  public async update({ response, auth }: HttpContextContract, request: MissingUpdateRequest) {
+    const { artistId, paintingId } = request.params()
     const data = request.validated()
 
-    const painting = await Painting.findOrFail(id)
-    painting.sensitive = data.sensitive
-    await painting.save()
+    const painting = await Painting.findOrFail(paintingId)
+    painting.banned = data.banned || false
+    painting.contentWarning = data.contentWarning || null
 
-    return response.redirect().toRoute('missings.index')
+    await painting.save()
+    await painting.related('reviewer').associate(auth.user!)
+
+    return response.redirect().toRoute('missings.index', [artistId])
   }
 
   public async destroy({}: HttpContextContract) {

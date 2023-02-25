@@ -1,6 +1,5 @@
 import { BaseCommand } from '@adonisjs/core/build/standalone'
 import Database, { TransactionClientContract } from '@ioc:Adonis/Lucid/Database'
-import Logger from '@ioc:Adonis/Core/Logger'
 import Artist from 'App/Models/Artist'
 import Painting from 'App/Models/Painting'
 import Tag from 'App/Models/Tag'
@@ -53,6 +52,7 @@ export default class FetchPaintings extends BaseCommand {
           title: fullPainting.title,
           completitionYear: fullPainting.completitionYear,
           imageUrl: fullPainting.image,
+          url: fullPainting.url,
         },
         { client: this.trx }
       )

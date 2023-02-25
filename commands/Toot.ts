@@ -6,6 +6,7 @@ import Painting from 'App/Models/Painting'
 import axios from 'axios'
 import Mastodon from 'App/Services/Mastodon'
 import { WIKIART_BASE_URL } from 'App/Services/Wikiart'
+import { DateTime } from 'luxon'
 
 export default class Toot extends BaseCommand {
   public static commandName = 'toot'
@@ -51,6 +52,7 @@ export default class Toot extends BaseCommand {
     this.logger.info(`Tooting for artist ${artist.wikiartSeo}`)
     await this.downloadPaintingImage(painting)
     await this.sendToot(artist, painting)
+    await this.updatePainting(painting)
   }
 
   private pickPainting(artist: Artist): Promise<Painting | null> {
@@ -58,7 +60,8 @@ export default class Toot extends BaseCommand {
       .from(
         Database.from('paintings')
           .where('artist_id', artist.id)
-          .whereNotNull('sensitive')
+          .andWhere('banned', false)
+          .andWhereNotNull('reviewer_id')
           .orderByRaw('posted_at ASC NULLS FIRST, RANDOM()')
           .limit(20)
           .as('painting_pool')
@@ -84,15 +87,28 @@ export default class Toot extends BaseCommand {
       description
     )
 
-    const contentWarning =
-      painting.contentWarning === null ? '' : `\nCW: ${painting.contentWarning}`
+    const sensitive = painting.contentWarning !== null
+    const contentWarning = sensitive ? `[CW: ${painting.contentWarning}]\n` : ''
 
-    const status = await mastodon.toot(
-      `${description}${contentWarning}`,
-      `${WIKIART_BASE_URL}/${artist.wikiartSeo}/${painting.url}`,
-      false,
+    const tags = await painting.related('tags').query().limit(10)
+    const tagLine = tags
+      .concat(await artist.related('tags').query())
+      .map((tag) => tag.name)
+      .concat('artbot')
+      .map((tag) => `#${tag}`)
+      .join(' ')
+
+    await mastodon.toot(
+      `${contentWarning}${description}`,
+      `${WIKIART_BASE_URL}/${artist.wikiartSeo}/${painting.url}\n${tagLine}`,
+      sensitive,
       mediaAttachement
     )
+  }
+
+  private async updatePainting(painting: Painting) {
+    painting.postedAt = DateTime.now()
+    return painting.save()
   }
 
   private paintingLocation(id: number) {

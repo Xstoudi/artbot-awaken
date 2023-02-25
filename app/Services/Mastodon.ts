@@ -31,23 +31,25 @@ export default class Mastodon {
   }
 
   public async uploadMedia(file: Blob, description: string) {
-    return this.mastoInstance.v1.mediaAttachments.create({
+    return this.mastoInstance.v2.mediaAttachments.create({
       file,
       description,
     })
   }
 
   public async toot(
-    shownText: string,
-    hiddenText: string,
+    text: string,
+    subText: string,
     sensitive: boolean,
     media: Awaited<ReturnType<typeof this.uploadMedia>>
   ) {
+    const spoilerText = sensitive ? text : undefined
+    const status = sensitive ? subText : `${text}\n\n${subText}`
     return this.mastoInstance.v1.statuses.create({
-      spoilerText: shownText,
-      status: hiddenText,
+      spoilerText,
+      status,
       visibility: 'public',
-      sensitive: sensitive,
+      sensitive,
       mediaIds: [media.id],
       language: 'en',
     })

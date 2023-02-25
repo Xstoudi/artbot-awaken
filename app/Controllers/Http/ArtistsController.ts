@@ -138,11 +138,16 @@ export default class ArtistsController {
   public async toot({ request, response }: HttpContextContract) {
     const { id } = request.params()
     try {
-      await execa.node('ace', ['toot', '-a', id], {})
+      await execa.node('ace', ['toot', '-a', id], {
+        stdio: 'inherit',
+      })
     } catch (error) {
       // TODO handle error
+      console.log(error)
     }
     // TODO handle success
+
+    console.log('success')
 
     return response.redirect().back()
   }

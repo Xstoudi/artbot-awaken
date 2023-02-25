@@ -19,7 +19,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ghcr.io/xstoudi/artbot-app
+            ghcr.io/xstoudi/artbot
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -44,4 +44,4 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          file: Dockerfile.app
+          file: Dockerfile

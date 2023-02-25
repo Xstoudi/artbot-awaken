@@ -1,6 +1,5 @@
 import masto from 'masto'
 import Env from '@ioc:Adonis/Core/Env'
-import Drive from '@ioc:Adonis/Core/Drive'
 
 type MastoClient = Awaited<ReturnType<typeof masto.login>>
 

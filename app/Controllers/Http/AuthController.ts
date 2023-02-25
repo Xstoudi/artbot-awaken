@@ -1,4 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Logger from '@ioc:Adonis/Core/Logger'
 
 export default class AuthController {
   public async index({ view }: HttpContextContract) {
@@ -12,6 +13,7 @@ export default class AuthController {
       await auth.attempt(email, password)
       return response.redirect().toRoute('artists.index')
     } catch (error) {
+      Logger.error(error)
       return response.redirect().toRoute('auth.index')
     }
   }

@@ -1,6 +1,6 @@
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', async ({ response }) => response.redirect().toRoute('artists.index')).as('index')
+Route.get('/', 'IndexController.index').as('index')
 
 Route.get('/auth/login', 'AuthController.index').as('auth.index')
 Route.post('/auth/login', 'AuthController.login').as('auth.login')

@@ -1,7 +1,6 @@
 import Hash from '@ioc:Adonis/Core/Hash'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { formRequest } from '@melchyore/adonis-form-request/build'
-import Painting from 'App/Models/Painting'
 import User from 'App/Models/User'
 import ChangePasswordRequest from 'App/Requests/ChangePasswordRequest'
 import CreateUserRequest from 'App/Requests/CreateUserRequest'

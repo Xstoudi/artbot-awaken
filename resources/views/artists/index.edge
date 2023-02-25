@@ -8,10 +8,12 @@
   @end
   @end
 
-  @card({ link: route('artists.create')})
-  <div
-    class="w-full h-full text-center text-black text-gray-900 align-middle border-4 border-dashed text-7xl dark:text-white rounded-xl">
-  </div>
+  @can('ArtistPolicy.create')
+    @card({ link: route('artists.create')})
+    <div
+      class="w-full h-full text-center text-black text-gray-900 align-middle border-4 border-dashed text-7xl dark:text-white rounded-xl">
+    </div>
+    @end
   @end
 </div>
 @end

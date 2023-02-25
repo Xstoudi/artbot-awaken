@@ -38,13 +38,18 @@ export default class ArtistsController {
     })
   }
 
-  public async create({ view }: HttpContextContract) {
+  public async create({ view, bouncer }: HttpContextContract) {
+    await bouncer.with('ArtistPolicy').authorize('create')
     return view.render('artists/create')
   }
 
   @formRequest()
-  public async store({ response, session }: HttpContextContract, request: StoreArtistRequest) {
+  public async store(
+    { response, session, bouncer }: HttpContextContract,
+    request: StoreArtistRequest
+  ) {
     const data = request.validated()
+    await bouncer.with('ArtistPolicy').authorize('create')
 
     const instance = await Mastodon.with(data.mastoAccessToken)
 
@@ -127,9 +132,10 @@ export default class ArtistsController {
     throw new Error('Not implemented')
   }
 
-  public async destroy({ request, response }: HttpContextContract) {
+  public async destroy({ request, response, bouncer }: HttpContextContract) {
     const { id } = request.params()
     const artist = await Artist.findOrFail(id)
+    await bouncer.with('ArtistPolicy').authorize('delete')
     artist.deletedAt = DateTime.now()
     await artist.save()
     return response.redirect().toRoute('artists.index')

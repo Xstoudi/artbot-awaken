@@ -1,5 +1,6 @@
 import masto from 'masto'
 import Env from '@ioc:Adonis/Core/Env'
+import ResponseCache from './ResponseCache'
 
 type MastoClient = Awaited<ReturnType<typeof masto.login>>
 
@@ -16,17 +17,23 @@ export default class Mastodon {
       accessToken,
     })
 
-    const serviceInstance = new Mastodon(instance)
+    const serviceInstance = new Mastodon(instance, accessToken)
 
     this.cachedInstances.set(accessToken, serviceInstance)
 
     return serviceInstance
   }
 
-  private constructor(private mastoInstance: MastoClient) {}
+  private verifyCredentialsCache: ResponseCache<
+    Awaited<ReturnType<typeof this.mastoInstance.v1.accounts.verifyCredentials>>
+  > = new ResponseCache()
 
-  public verifyCredentials() {
-    return this.mastoInstance.v1.accounts.verifyCredentials()
+  private constructor(private mastoInstance: MastoClient, private accessToken: string) {}
+
+  public async verifyCredentials() {
+    return this.verifyCredentialsCache.getOr(this.accessToken, () =>
+      this.mastoInstance.v1.accounts.verifyCredentials()
+    )
   }
 
   public async uploadMedia(file: Blob, description: string) {

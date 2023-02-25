@@ -13,6 +13,10 @@ Route.group(() => {
     .as('missings')
     .paramFor('artists', 'artistId')
     .paramFor('missings', 'paintingId')
+
+  Route.get('/users', 'UsersController.index').as('users.index')
+  Route.post('/users', 'UsersController.store').as('users.store')
   Route.get('/users/:id', 'UsersController.show').as('users.show')
+  Route.delete('/users/:id', 'UsersController.destroy').as('users.destroy')
   Route.post('/users/:id/password', 'UsersController.changePassword').as('users.changePassword')
 }).middleware('auth')

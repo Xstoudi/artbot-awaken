@@ -39,7 +39,8 @@
       "@adonisjs/lucid",
       "@melchyore/adonis-form-request",
       "@adonisjs/i18n",
-      "@stouder-io/adonis-scheduler"
+      "@stouder-io/adonis-scheduler",
+      "@adonisjs/bouncer"
     ]
   }
 }

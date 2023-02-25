@@ -6,7 +6,8 @@
     "@adonisjs/repl/build/commands",
     "@adonisjs/lucid/build/commands",
     "@melchyore/adonis-form-request/build/commands",
-    "@stouder-io/adonis-scheduler/build/commands/MakeTask"
+    "@stouder-io/adonis-scheduler/build/commands/MakeTask",
+    "@adonisjs/bouncer/build/commands"
   ],
   "exceptionHandlerNamespace": "App/Exceptions/Handler",
   "aliases": {
@@ -24,7 +25,8 @@
       "environment": [
         "web"
       ]
-    }
+    },
+    "./start/bouncer"
   ],
   "providers": [
     "./providers/AppProvider",
@@ -36,7 +38,8 @@
     "@adonisjs/lucid",
     "@melchyore/adonis-form-request",
     "@adonisjs/i18n",
-    "@stouder-io/adonis-scheduler"
+    "@stouder-io/adonis-scheduler",
+    "@adonisjs/bouncer"
   ],
   "metaFiles": [
     {

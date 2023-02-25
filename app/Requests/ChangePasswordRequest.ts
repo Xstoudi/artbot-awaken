@@ -2,6 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 import { FormRequest } from '@ioc:Adonis/Addons/FormRequest'
 import ChangePasswordValidator from 'App/Validators/ChangePasswordValidator'
+import User from 'App/Models/User'
 
 export default class ChangePasswordRequest extends FormRequest {
   constructor(protected context: HttpContextContract) {
@@ -9,7 +10,9 @@ export default class ChangePasswordRequest extends FormRequest {
   }
 
   public async authorize() {
-    return this.context.auth.user?.id === Number(this.context.params.id)
+    const { id } = this.context.request.params()
+    const user = await User.findOrFail(id)
+    return this.context.bouncer.with('UserPolicy').allows('update', user)
   }
 
   public rules() {

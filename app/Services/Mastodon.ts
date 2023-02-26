@@ -13,7 +13,7 @@ export default class Mastodon {
     }
 
     const instance = await masto.login({
-      url: Env.get('MASTODON_URL'),
+      url: `https://${Env.get('MASTODON_URL')}`,
       accessToken,
     })
 

@@ -1,10 +1,11 @@
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', 'IndexController.index').as('index')
-
-Route.get('/auth/login', 'AuthController.index').as('auth.index')
-Route.post('/auth/login', 'AuthController.login').as('auth.login')
-Route.post('/auth/logout', 'AuthController.logout').as('auth.logout').middleware('auth')
+Route.group(() => {
+  Route.get('/', 'IndexController.index').as('index')
+  Route.get('/auth/login', 'AuthController.index').as('auth.index')
+  Route.post('/auth/login', 'AuthController.login').as('auth.login')
+  Route.post('/auth/logout', 'AuthController.logout').as('auth.logout').middleware('auth')
+}).middleware(['silentAuth'])
 
 Route.group(() => {
   Route.resource('/artists', 'ArtistsController').as('artists')
@@ -19,4 +20,4 @@ Route.group(() => {
   Route.get('/users/:id', 'UsersController.show').as('users.show')
   Route.delete('/users/:id', 'UsersController.destroy').as('users.destroy')
   Route.post('/users/:id/password', 'UsersController.changePassword').as('users.changePassword')
-}).middleware('auth')
+}).middleware(['auth'])

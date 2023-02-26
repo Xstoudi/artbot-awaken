@@ -3,7 +3,7 @@ import Artist from 'App/Models/Artist'
 import Mastodon from 'App/Services/Mastodon'
 
 export default class IndicesController {
-  public async index({ view }: HttpContextContract) {
+  public async index({ view, auth }: HttpContextContract) {
     const artistsData = await Artist.query().whereNull('deleted_at')
 
     const artists = (

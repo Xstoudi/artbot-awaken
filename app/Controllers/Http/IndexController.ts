@@ -10,7 +10,10 @@ export default class IndicesController {
       await Promise.allSettled(
         artistsData.map((artistData) =>
           Mastodon.with(artistData.mastoAccessToken)
-            .then((masto) => masto.verifyCredentials())
+            .then((masto) => masto.verifyCredentials().catch(err => {
+              console.log(err)
+              throw err
+            })
             .then(async (mastoAccount) => ({
               id: artistData.id,
               name: artistData.name,

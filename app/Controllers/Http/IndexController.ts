@@ -16,6 +16,12 @@ export default class IndicesController {
               name: artistData.name,
               mastodon: mastoAccount,
             }))
+            .catch(() => {
+              console.log(
+                `Something failed for ${artistData.name} (${artistData.id}) with token ${artistData.mastoAccessToken}`
+              )
+              return null
+            })
         )
       )
     )

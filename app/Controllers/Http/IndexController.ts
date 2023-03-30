@@ -9,22 +9,25 @@ export default class IndicesController {
     const artists = (
       await Promise.allSettled(
         artistsData.map((artistData) =>
-          Mastodon.with(artistData.mastoAccessToken)
-            .then((masto) => masto.verifyCredentials().catch(err => {
-              console.log(err)
-              throw err
-            })
-            .then(async (mastoAccount) => ({
-              id: artistData.id,
-              name: artistData.name,
-              mastodon: mastoAccount,
-            }))
-            .catch((err) => {
-              console.log(
-                `Something failed for ${artistData.name} (${artistData.id}) with token ${artistData.mastoAccessToken}`
-              )
-              throw err
-            })
+          Mastodon.with(artistData.mastoAccessToken).then((masto) =>
+            masto
+              .verifyCredentials()
+              .catch((err) => {
+                console.log(err)
+                throw err
+              })
+              .then(async (mastoAccount) => ({
+                id: artistData.id,
+                name: artistData.name,
+                mastodon: mastoAccount,
+              }))
+              .catch((err) => {
+                console.log(
+                  `Something failed for ${artistData.name} (${artistData.id}) with token ${artistData.mastoAccessToken}`
+                )
+                throw err
+              })
+          )
         )
       )
     )

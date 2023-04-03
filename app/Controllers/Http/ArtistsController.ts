@@ -93,6 +93,7 @@ export default class ArtistsController {
       .query()
       .preload('tags')
       .preload('reviewer')
+      .orderBy('id')
       .paginate(page, 10)
 
     paintings.baseUrl(`/artists/${id}`)

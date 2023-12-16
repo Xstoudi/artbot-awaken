@@ -87,8 +87,8 @@ export default class Toot extends BaseCommand {
       description
     )
 
-    const sensitive = true && painting.contentWarning !== null
-    //const contentWarning = sensitive ? `[CW: ${painting.contentWarning}]\n` : ''
+    const sensitive = painting.contentWarning !== null
+    const contentWarning = sensitive ? `[CW: ${painting.contentWarning}]\n` : ''
 
     const tags = await painting.related('tags').query().limit(10)
     const tagLine = tags
@@ -99,7 +99,7 @@ export default class Toot extends BaseCommand {
       .join(' ')
 
     await mastodon.toot(
-      `${description}`,
+      `${contentWarning}${description}`,
       `${WIKIART_BASE_URL}/${artist.wikiartSeo}/${painting.url}\n${tagLine}`,
       sensitive,
       mediaAttachement

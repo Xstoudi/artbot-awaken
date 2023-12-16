@@ -1,5 +1,17 @@
 {
   "commands": {
+    "clean": {
+      "settings": {
+        "loadApp": true,
+        "stayAlive": false
+      },
+      "commandPath": "./commands/Clean",
+      "commandName": "clean",
+      "description": "Clean temp folder",
+      "args": [],
+      "aliases": [],
+      "flags": []
+    },
     "fetch:paintings": {
       "settings": {
         "loadApp": true,

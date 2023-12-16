@@ -51,6 +51,9 @@ export default class Painting extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
+  @column.dateTime({ autoUpdate: true })
+  public reviewedAt?: DateTime
+
   @belongsTo(() => Artist)
   public artist: BelongsTo<typeof Artist>
 

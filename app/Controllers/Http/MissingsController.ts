@@ -3,6 +3,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import { formRequest } from '@melchyore/adonis-form-request/build'
 import Painting from 'App/Models/Painting'
 import MissingUpdateRequest from 'App/Requests/MissingUpdateRequest'
+import { DateTime } from 'luxon'
 
 export default class MissingsController {
   public async index({ response, request, view }: HttpContextContract) {
@@ -87,6 +88,7 @@ export default class MissingsController {
     const painting = await Painting.findOrFail(paintingId)
     painting.banned = data.banned || false
     painting.contentWarning = data.contentWarning || null
+    painting.reviewedAt = DateTime.now()
 
     await painting.save()
     await painting.related('reviewer').associate(auth.user!)

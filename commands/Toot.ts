@@ -60,7 +60,7 @@ export default class Toot extends BaseCommand {
       .from(
         Database.from('paintings')
           .where('artist_id', artist.id)
-          //.andWhere('banned', false)
+          .andWhere('banned', false)
           //.andWhereNotNull('reviewer_id')
           .orderByRaw('posted_at ASC NULLS FIRST, RANDOM()')
           .limit(20)

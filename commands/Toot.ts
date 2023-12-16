@@ -60,8 +60,8 @@ export default class Toot extends BaseCommand {
       .from(
         Database.from('paintings')
           .where('artist_id', artist.id)
-          .andWhere('banned', false)
-          .andWhereNotNull('reviewer_id')
+          //.andWhere('banned', false)
+          //.andWhereNotNull('reviewer_id')
           .orderByRaw('posted_at ASC NULLS FIRST, RANDOM()')
           .limit(20)
           .as('painting_pool')
@@ -78,7 +78,7 @@ export default class Toot extends BaseCommand {
 
   private async sendToot(artist: Artist, painting: Painting) {
     const description = `${painting.title}${
-      painting.completitionYear === null ? '' : `, ${painting.completitionYear}`
+      (painting.completitionYear === null ? '' : `, ${painting.completitionYear}`)
     } by ${artist.name}`
 
     const mastodon = await Mastodon.with(artist.mastoAccessToken)
@@ -87,8 +87,8 @@ export default class Toot extends BaseCommand {
       description
     )
 
-    const sensitive = painting.contentWarning !== null
-    const contentWarning = sensitive ? `[CW: ${painting.contentWarning}]\n` : ''
+    const sensitive = true && painting.contentWarning !== null
+    //const contentWarning = sensitive ? `[CW: ${painting.contentWarning}]\n` : ''
 
     const tags = await painting.related('tags').query().limit(10)
     const tagLine = tags
@@ -99,7 +99,7 @@ export default class Toot extends BaseCommand {
       .join(' ')
 
     await mastodon.toot(
-      `${contentWarning}${description}`,
+      `${description}`,
       `${WIKIART_BASE_URL}/${artist.wikiartSeo}/${painting.url}\n${tagLine}`,
       sensitive,
       mediaAttachement

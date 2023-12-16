@@ -7,32 +7,32 @@
   <div class="text-2xl text-center">
     {{ missing.title }} by {{ missing.artist.wikiartSeo }}, {{ missing.completitionYear || 'Unknown' }}
   </div>
+  <div class="flex gap-4 justify-center">
+        <form action="{{ route('missings.update', [artistId, missing.id]) }}?_method=PUT" method="post">
+          <div class="flex gap-4">
+          @!input({
+          name: 'contentWarning',
+          type: 'text',
+          value: missing.contentWarning || ''
+          })
+          <button type="submit"
+            class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Review</button>
+        </div>
+      </form>
+      <form action="{{ route('missings.update', [artistId, missing.id]) }}?_method=PUT" method="post">
+        <div class="flex">
+          @!input({
+          name: 'banned',
+          type: 'hidden',
+          value: true
+          })
+          <button type="submit"
+            class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">BAN HAMMER</button>
+        </div>
+      </form>
+    </div>
   <div class="flex justify-center">
     <img class="h-auto max-w-full rounded-lg" src="{{ missing.imageUrl }}" alt="image description">
-  </div>
-  <div class="flex gap-4 justify-center">
-      <form action="{{ route('missings.update', [artistId, missing.id]) }}?_method=PUT" method="post">
-        <div class="flex gap-4">
-        @!input({
-        name: 'contentWarning',
-        type: 'text',
-        value: missing.contentWarning || ''
-        })
-        <button type="submit"
-          class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Review</button>
-      </div>
-    </form>
-    <form action="{{ route('missings.update', [artistId, missing.id]) }}?_method=PUT" method="post">
-      <div class="flex">
-        @!input({
-        name: 'banned',
-        type: 'hidden',
-        value: true
-        })
-        <button type="submit"
-          class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">BAN HAMMER</button>
-      </div>
-    </form>
   </div>
 </div>
 @end
